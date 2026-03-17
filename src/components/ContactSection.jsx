@@ -1,73 +1,33 @@
-import { useState } from 'react'
+import { z } from 'zod' // Schema validation library
+import { useForm } from 'react-hook-form' // Form state & validation
+import { zodResolver } from '@hookform/resolvers/zod'
 import { Clock3, Mail, MapPin, Phone } from 'lucide-react'
 
-const initialState = {
-	name: '',
-	email: '',
-	message: '',
-}
-
-const initialErrors = {
-	name: '',
-	email: '',
-	message: '',
-}
-
-function isEmail(value) {
-	return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
-}
+// Advanced Form Handling - Zod schema defines validation rules
+const schema = z.object({
+	name: z.string().trim().min(2, 'Name should be at least 2 characters.'),
+	email: z.string().trim().email('Please enter a valid email address.'),
+	message: z.string().trim().min(10, 'Message should be at least 10 characters.'),
+})
 
 export default function ContactSection({ darkMode }) {
-	const [formData, setFormData] = useState(initialState)
-	const [errors, setErrors] = useState(initialErrors)
-	const [successMessage, setSuccessMessage] = useState('')
+	// React Hook Form setup with Zod validation and onTouched mode
+	const {
+		register,
+		handleSubmit,
+		watch,
+		formState: { errors },
+	} = useForm({
+		resolver: zodResolver(schema),
+		defaultValues: {
+			name: '',
+			email: '',
+			message: '',
+		},
+		mode: 'onTouched', // Validate only after user leaves field
+	})
 
-	const handleChange = (field, value) => {
-		setFormData((previous) => ({ ...previous, [field]: value }))
-		setErrors((previous) => ({ ...previous, [field]: '' }))
-	}
-
-	const validateForm = () => {
-		const nextErrors = { ...initialErrors }
-
-		if (!formData.name.trim()) {
-			nextErrors.name = 'Name is required.'
-		} else if (formData.name.trim().length < 2) {
-			nextErrors.name = 'Name should be at least 2 characters.'
-		}
-
-		if (!formData.email.trim()) {
-			nextErrors.email = 'Email is required.'
-		} else if (!isEmail(formData.email.trim())) {
-			nextErrors.email = 'Please enter a valid email address.'
-		}
-
-		if (!formData.message.trim()) {
-			nextErrors.message = 'Message is required.'
-		} else if (formData.message.trim().length < 10) {
-			nextErrors.message = 'Message should be at least 10 characters.'
-		}
-
-		setErrors(nextErrors)
-
-		return Object.values(nextErrors).every((message) => message === '')
-	}
-
-	const handleSubmit = (event) => {
-		event.preventDefault()
-
-		if (!validateForm()) {
-			setSuccessMessage('')
-			return
-		}
-
-		setSuccessMessage('Your inquiry has been submitted successfully. We will contact you soon!')
-		setFormData(initialState)
-
-		window.setTimeout(() => {
-			setSuccessMessage('')
-		}, 5000)
-	}
+	const messageValue = watch('message') || ''
 
 	return (
 		<section
@@ -137,7 +97,7 @@ export default function ContactSection({ darkMode }) {
 				</div>
 
 				<form
-					onSubmit={handleSubmit}
+					onSubmit={handleSubmit(() => {})}
 					noValidate
 					className={`rounded-[28px] border p-6 lg:p-8 ${
 						darkMode ? 'border-white/10 bg-black/30' : 'border-slate-200 bg-slate-50'
@@ -148,8 +108,7 @@ export default function ContactSection({ darkMode }) {
 						<input
 							id="name"
 							type="text"
-							value={formData.name}
-							onChange={(event) => handleChange('name', event.target.value)}
+							{...register('name')}
 							placeholder="Your name"
 							className={`mt-2 block w-full rounded-xl border px-4 py-3 outline-none transition ${
 								errors.name
@@ -159,7 +118,7 @@ export default function ContactSection({ darkMode }) {
 										: 'border-slate-300 bg-white text-slate-950 focus:border-[#d4a017]'
 							}`}
 						/>
-						{errors.name ? <span className="mt-1 block text-sm text-red-500">{errors.name}</span> : null}
+						{errors.name ? <span className="mt-1 block text-sm text-red-500">{errors.name.message}</span> : null}
 					</label>
 
 					<label
@@ -170,8 +129,7 @@ export default function ContactSection({ darkMode }) {
 						<input
 							id="email"
 							type="email"
-							value={formData.email}
-							onChange={(event) => handleChange('email', event.target.value)}
+							{...register('email')}
 							placeholder="your@email.com"
 							className={`mt-2 block w-full rounded-xl border px-4 py-3 outline-none transition ${
 								errors.email
@@ -181,7 +139,7 @@ export default function ContactSection({ darkMode }) {
 										: 'border-slate-300 bg-white text-slate-950 focus:border-[#d4a017]'
 							}`}
 						/>
-						{errors.email ? <span className="mt-1 block text-sm text-red-500">{errors.email}</span> : null}
+						{errors.email ? <span className="mt-1 block text-sm text-red-500">{errors.email.message}</span> : null}
 					</label>
 
 					<label
@@ -192,8 +150,8 @@ export default function ContactSection({ darkMode }) {
 						<textarea
 							id="message"
 							rows="5"
-							value={formData.message}
-							onChange={(event) => handleChange('message', event.target.value)}
+							maxLength={500}
+							{...register('message')}
 							placeholder="Tell us about your fitness goals"
 							className={`mt-2 block min-h-[140px] w-full rounded-xl border px-4 py-3 outline-none transition ${
 								errors.message
@@ -203,7 +161,12 @@ export default function ContactSection({ darkMode }) {
 										: 'border-slate-300 bg-white text-slate-950 focus:border-[#d4a017]'
 							}`}
 						/>
-						{errors.message ? <span className="mt-1 block text-sm text-red-500">{errors.message}</span> : null}
+						<div className="mt-1 flex items-center justify-between">
+							{errors.message ? <span className="block text-sm text-red-500">{errors.message.message}</span> : <span />}
+							<span className={`text-xs ${darkMode ? 'text-white/45' : 'text-slate-500'}`}>
+								{messageValue.length}/500
+							</span>
+						</div>
 					</label>
 
 					<button
@@ -212,12 +175,6 @@ export default function ContactSection({ darkMode }) {
 					>
 						Send Message
 					</button>
-
-					{successMessage ? (
-						<p className="mt-4 text-sm font-semibold text-emerald-400" role="status" aria-live="polite">
-							{successMessage}
-						</p>
-					) : null}
 				</form>
 			</div>
 		</section>
