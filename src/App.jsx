@@ -9,8 +9,10 @@ import ContactSection from './components/ContactSection'
 import Footer from './components/Footer'
 
 function App() {
+  // Dark Mode - Toggle between dark/light themes with localStorage persistence
   const [darkMode, setDarkMode] = useState(true)
 
+  // Restore user's theme preference on page load
   useEffect(() => {
     const savedMode = localStorage.getItem('darkMode')
     if (savedMode !== null) {
@@ -18,6 +20,7 @@ function App() {
     }
   }, [])
 
+  // Toggle dark mode and save preference to localStorage
   const toggleDarkMode = () => {
     setDarkMode((previous) => {
       const next = !previous
@@ -26,6 +29,7 @@ function App() {
     })
   }
 
+  // Apply dark mode styles globally to all sections
   return (
     <div
       className={`min-h-screen transition-colors duration-300 ${
