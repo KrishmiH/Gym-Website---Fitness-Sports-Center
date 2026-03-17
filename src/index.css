@@ -1,0 +1,49 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
+@import "tailwindcss";
+
+html,
+body,
+#root {
+	min-height: 100%;
+}
+
+html {
+	scroll-behavior: smooth;
+}
+
+body {
+	font-family: 'Manrope', sans-serif;
+}
+
+h1,
+h2,
+h3,
+a,
+button,
+small {
+	font-family: 'Space Grotesk', sans-serif;
+}
+
+@keyframes rise {
+	from {
+		opacity: 0;
+		transform: translateY(16px);
+	}
+
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@keyframes slideIn {
+	from {
+		opacity: 0;
+		transform: translateX(18px);
+	}
+
+	to {
+		opacity: 1;
+		transform: translateX(0);
+	}
+}
