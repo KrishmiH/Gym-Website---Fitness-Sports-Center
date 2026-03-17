@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { z } from 'zod' // Schema validation library
 import { useForm } from 'react-hook-form' // Form state & validation
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -11,12 +12,15 @@ const schema = z.object({
 })
 
 export default function ContactSection({ darkMode }) {
+	// Track form submission state (success/error/loading)
+	const [submitState, setSubmitState] = useState({ type: '', message: '' })
 	// React Hook Form setup with Zod validation and onTouched mode
 	const {
 		register,
 		handleSubmit,
+		reset,
 		watch,
-		formState: { errors },
+		formState: { errors, isSubmitting }, // isSubmitting tracks API request in progress
 	} = useForm({
 		resolver: zodResolver(schema),
 		defaultValues: {
@@ -28,6 +32,50 @@ export default function ContactSection({ darkMode }) {
 	})
 
 	const messageValue = watch('message') || ''
+
+	useEffect(() => {
+		if (!submitState.message) {
+			return
+		}
+
+		const timer = window.setTimeout(() => {
+			setSubmitState({ type: '', message: '' })
+		}, 5000)
+
+		return () => window.clearTimeout(timer)
+	}, [submitState])
+
+	// API Integration - Async form submission to external server
+	const onSubmit = async (values) => {
+		setSubmitState({ type: '', message: '' })
+
+		try {
+			// POST request to JSONPlaceholder API with validated form data
+			const response = await fetch('https://jsonplaceholder.typicode.com/posts', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify(values),
+			})
+
+			if (!response.ok) {
+				throw new Error('Failed to submit')
+			}
+
+			reset() // Clear form after successful submission
+			setSubmitState({
+				type: 'success',
+				message: 'Your inquiry has been submitted successfully. We will contact you soon!',
+			})
+		} catch {
+			// Show error message if API call fails
+			setSubmitState({
+				type: 'error',
+				message: 'Submission failed. Please try again in a moment.',
+			})
+		}
+	}
 
 	return (
 		<section
@@ -97,7 +145,7 @@ export default function ContactSection({ darkMode }) {
 				</div>
 
 				<form
-					onSubmit={handleSubmit(() => {})}
+					onSubmit={handleSubmit(onSubmit)}
 					noValidate
 					className={`rounded-[28px] border p-6 lg:p-8 ${
 						darkMode ? 'border-white/10 bg-black/30' : 'border-slate-200 bg-slate-50'
@@ -169,12 +217,26 @@ export default function ContactSection({ darkMode }) {
 						</div>
 					</label>
 
+					{/* Advanced Form Handling - Submit with loading state and success/error feedback */}
 					<button
 						type="submit"
+						disabled={isSubmitting}
 						className="inline-flex w-full items-center justify-center rounded-xl bg-[#d4a017] px-5 py-3 font-['Space_Grotesk'] font-bold text-black transition-transform hover:-translate-y-0.5"
 					>
-						Send Message
+						{isSubmitting ? 'Sending...' : 'Send Message'}
 					</button>
+
+					{submitState.message ? (
+						<p
+							className={`mt-4 text-sm font-semibold ${
+								submitState.type === 'success' ? 'text-emerald-400' : 'text-red-400'
+							}`}
+							role="status"
+							aria-live="polite"
+						>
+							{submitState.message}
+						</p>
+					) : null}
 				</form>
 			</div>
 		</section>
