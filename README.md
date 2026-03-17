@@ -81,3 +81,4 @@ Branding assets were sourced from the provided drive and integrated into the pro
 - Figma design: https://www.figma.com/design/VeSpCbDttyPCZe9KcXIQWD/Fitness-Sports-Center-%E2%80%93-Website-Design?node-id=0-1&t=LLmEOWNUulRnCbLm-1
 - GitHub repository: https://github.com/KrishmiH/Gym-Website---Fitness-Sports-Center.git
 - Live deployed site: https://gym-website-fitness-sports-center.vercel.app
+						or use this https://gym-website-g37ivd4ca-krishmihs-projects.vercel.app
