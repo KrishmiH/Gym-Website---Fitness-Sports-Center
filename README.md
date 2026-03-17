@@ -1,7 +1,3 @@
-# FitForge Gym Promotional Website
-
-Responsive promotional website developed for the Web Development Internship Evaluation.
-
 ## Project Overview
 
 This project was built for a local fitness brand launching a new gym. The goal is to attract new members using a modern, responsive landing experience that introduces services, trainers, plans, and an inquiry workflow.
