@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { motion } from 'framer-motion'
 import { Activity, Apple, Dumbbell, Heart, Search, Trophy, Users } from 'lucide-react'
 
 const services = [
@@ -119,9 +120,13 @@ export default function Services({ darkMode }) {
 
 				<div className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
 					{/* Animations - Framer Motion scroll-reveal: cards fade in & slide up with staggered delays */}
-					{filteredServices.map((service) => (
-						<article
+					{filteredServices.map((service, index) => (
+						<motion.article
 							key={service.title}
+							initial={{ opacity: 0, y: 18 }}
+							whileInView={{ opacity: 1, y: 0 }}
+							viewport={{ once: true, amount: 0.25 }}
+							transition={{ duration: 0.4, delay: index * 0.06 }}
 							className={`rounded-[28px] border p-6 transition-transform hover:-translate-y-1 hover:border-[#d4a017]/60 ${
 								darkMode ? 'border-white/10 bg-[#111111]' : 'border-slate-200 bg-white'
 							}`}
@@ -134,7 +139,7 @@ export default function Services({ darkMode }) {
 							<p className={`mt-3 text-sm leading-7 ${darkMode ? 'text-white/65' : 'text-slate-600'}`}>
 								{service.description}
 							</p>
-						</article>
+						</motion.article>
 					))}
 
 					{filteredServices.length === 0 ? (
@@ -147,4 +152,3 @@ export default function Services({ darkMode }) {
 		</section>
 	)
 }
-

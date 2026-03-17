@@ -1,19 +1,23 @@
+import { motion } from 'framer-motion'
 import trainerOne from '../assets/Image3.jpg'
 import trainerTwo from '../assets/Image4.jpg'
 import trainerThree from '../assets/Image5.jpg'
 
-const trainers = [
+const fallbackTrainers = [
 	{
+		id: 1,
 		name: 'Alex Carter',
 		role: 'Strength Coach',
 		image: trainerOne,
 	},
 	{
+		id: 2,
 		name: 'Mia Johnson',
 		role: 'Yoga & Mobility',
 		image: trainerTwo,
 	},
 	{
+		id: 3,
 		name: 'Ryan Blake',
 		role: 'Personal Trainer',
 		image: trainerThree,
@@ -21,6 +25,8 @@ const trainers = [
 ]
 
 export default function Trainers({ darkMode }) {
+	const trainers = fallbackTrainers
+
 	return (
 		<section
 			id="trainers"
@@ -33,11 +39,19 @@ export default function Trainers({ darkMode }) {
 				<h2 className="max-w-2xl font-['Space_Grotesk'] text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
 					Meet Our Trainers
 				</h2>
+				<p className={`mt-4 text-sm ${darkMode ? 'text-white/70' : 'text-slate-600'}`}>
+					Our expert coaching team is here to guide every stage of your fitness journey.
+				</p>
 
 				<div className="mt-10 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-					{trainers.map((trainer) => (
-						<article
-							key={trainer.name}
+					{/* Animations - Cards fade in and slide up as they enter viewport with staggered delays */}
+					{trainers.map((trainer, index) => (
+						<motion.article
+							key={`${trainer.id}-${trainer.name}`}
+							initial={{ opacity: 0, y: 20 }}
+							whileInView={{ opacity: 1, y: 0 }}
+							viewport={{ once: true, amount: 0.25 }}
+							transition={{ duration: 0.45, delay: index * 0.08 }}
 							className={`overflow-hidden rounded-[28px] border transition-transform hover:-translate-y-1 hover:border-[#d4a017]/60 ${
 								darkMode ? 'border-white/10 bg-[#111111]' : 'border-slate-200 bg-white'
 							}`}
@@ -49,7 +63,7 @@ export default function Trainers({ darkMode }) {
 								<h3 className="font-['Space_Grotesk'] text-2xl font-bold">{trainer.name}</h3>
 								<p className="mt-2 font-semibold text-[#d4a017]">{trainer.role}</p>
 							</div>
-						</article>
+						</motion.article>
 					))}
 				</div>
 			</div>
